@@ -7,6 +7,14 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
     />
     <title>OpenClaw Control</title>
+    <link rel="stylesheet" href="./assets/jagavoice-kiosk.css" />
+    <script>
+      (function () {
+        if (/\/jagavoiceagent\/?$/i.test(window.location.pathname)) {
+          document.documentElement.setAttribute("data-jaga-voice-kiosk", "true");
+        }
+      })();
+    </script>
     <meta name="color-scheme" content="dark light" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png" />

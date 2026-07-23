@@ -1,0 +1,194 @@
+/* Jaga Voice Agent — accessible kiosk UI for low-vision users */
+
+html[data-jaga-voice-kiosk="true"] {
+  --jaga-mic-size: min(280px, 42vw);
+  --jaga-mic-blue: #0066cc;
+  --jaga-mic-blue-active: #004999;
+  --jaga-text-size: clamp(1.125rem, 2.8vw, 1.5rem);
+}
+
+html[data-jaga-voice-kiosk="true"] body {
+  background: #0a1628;
+  color: #ffffff;
+}
+
+/* Hide navigation chrome — voice-only experience */
+html[data-jaga-voice-kiosk="true"] .shell-nav,
+html[data-jaga-voice-kiosk="true"] .shell-nav-backdrop,
+html[data-jaga-voice-kiosk="true"] openclaw-app-topbar,
+html[data-jaga-voice-kiosk="true"] openclaw-command-palette,
+html[data-jaga-voice-kiosk="true"] .chat-controls,
+html[data-jaga-voice-kiosk="true"] .agent-chat__composer-combobox,
+html[data-jaga-voice-kiosk="true"] .agent-chat__attach-menu,
+html[data-jaga-voice-kiosk="true"] .agent-chat__talk-input-setting,
+html[data-jaga-voice-kiosk="true"] .chat-send-btn:not(.chat-send-btn--voice):not(.chat-send-btn--stop),
+html[data-jaga-voice-kiosk="true"] .agent-chat__control-label {
+  display: none !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .shell {
+  --shell-nav-width: 0px !important;
+  --shell-topbar-height: 0px !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 1fr !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .content,
+html[data-jaga-voice-kiosk="true"] .content--chat {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+}
+
+/* Page header */
+html[data-jaga-voice-kiosk="true"] .content::before {
+  content: "Voice Assistant";
+  display: block;
+  text-align: center;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  background: linear-gradient(180deg, #0d2240 0%, #0a1628 100%);
+  padding: 1.25rem 1rem 0.75rem;
+  border-bottom: 3px solid #0066cc;
+}
+
+html[data-jaga-voice-kiosk="true"] .content::after {
+  content: "Tap the blue microphone to speak";
+  display: block;
+  text-align: center;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 600;
+  color: #b8d4f0;
+  padding: 0.5rem 1rem 0;
+}
+
+/* Chat layout: transcript above, mic below */
+html[data-jaga-voice-kiosk="true"] openclaw-chat-page,
+html[data-jaga-voice-kiosk="true"] openclaw-chat-pane,
+html[data-jaga-voice-kiosk="true"] .agent-chat {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .agent-chat__main,
+html[data-jaga-voice-kiosk="true"] .agent-chat__body {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .chat-thread,
+html[data-jaga-voice-kiosk="true"] .chat-thread-inner {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  font-size: var(--jaga-text-size) !important;
+  line-height: 1.65 !important;
+  padding: 1rem 1.25rem !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .msg-bubble,
+html[data-jaga-voice-kiosk="true"] .msg-content {
+  font-size: var(--jaga-text-size) !important;
+  line-height: 1.65 !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .agent-chat__composer {
+  flex-shrink: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1.5rem 1rem 2rem !important;
+  background: #0d2240 !important;
+  border-top: 3px solid #0066cc !important;
+  gap: 1rem !important;
+}
+
+/* Large high-contrast microphone button */
+html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice,
+html[data-jaga-voice-kiosk="true"] .chat-send-btn--stop {
+  width: var(--jaga-mic-size) !important;
+  height: var(--jaga-mic-size) !important;
+  min-width: 180px !important;
+  min-height: 180px !important;
+  max-width: 320px !important;
+  max-height: 320px !important;
+  border-radius: 50% !important;
+  background: var(--jaga-mic-blue) !important;
+  color: #ffffff !important;
+  border: 8px solid #ffffff !important;
+  box-shadow:
+    0 0 0 4px #0066cc,
+    0 12px 40px rgba(0, 102, 204, 0.55) !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, background 0.15s ease !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice:hover,
+html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice:focus-visible {
+  background: #0077ee !important;
+  transform: scale(1.04) !important;
+  outline: 4px solid #ffcc00 !important;
+  outline-offset: 6px !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .chat-send-btn--stop {
+  background: #cc2200 !important;
+  border-color: #ffffff !important;
+  box-shadow:
+    0 0 0 4px #cc2200,
+    0 12px 40px rgba(204, 34, 0, 0.45) !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice svg,
+html[data-jaga-voice-kiosk="true"] .chat-send-btn--stop svg {
+  width: 40% !important;
+  height: 40% !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice:disabled {
+  background: #4a6080 !important;
+  border-color: #8899aa !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
+
+/* Status text — large and readable */
+html[data-jaga-voice-kiosk="true"] .agent-chat__talk-status,
+html[data-jaga-voice-kiosk="true"] .agent-chat__stt-interim {
+  font-size: clamp(1.25rem, 3vw, 1.75rem) !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  color: #ffffff !important;
+  background: #1a3a5c !important;
+  border: 2px solid #0066cc !important;
+  border-radius: 12px !important;
+  padding: 1rem 1.25rem !important;
+  margin: 0 1rem !important;
+  width: calc(100% - 2rem) !important;
+  max-width: 720px !important;
+}
+
+html[data-jaga-voice-kiosk="true"] .agent-chat__talk-status-text {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+}
+
+/* Connection banner — larger text */
+html[data-jaga-voice-kiosk="true"] openclaw-connection-banner,
+html[data-jaga-voice-kiosk="true"] openclaw-login-gate {
+  font-size: 1.125rem !important;
+}
