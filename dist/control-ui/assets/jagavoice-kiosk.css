@@ -1,15 +1,33 @@
-/* Jaga Voice Agent — accessible kiosk UI for low-vision users */
+/* Jaga Voice Agent — accessible, responsive kiosk UI */
 
 html[data-jaga-voice-kiosk="true"] {
-  --jaga-mic-size: min(280px, 42vw);
+  --jaga-mic-size: clamp(160px, 38vmin, 300px);
+  --jaga-mic-border: clamp(5px, 1.2vw, 8px);
   --jaga-mic-blue: #0066cc;
   --jaga-mic-blue-active: #004999;
-  --jaga-text-size: clamp(1.125rem, 2.8vw, 1.5rem);
+  --jaga-text-size: clamp(1rem, 2.6vw, 1.375rem);
+  --jaga-status-size: clamp(1.0625rem, 2.8vw, 1.625rem);
+  --jaga-title-size: clamp(1.375rem, 4.5vw, 2.125rem);
+  --jaga-subtitle-size: clamp(0.9375rem, 2.4vw, 1.1875rem);
+  --jaga-page-pad-x: clamp(0.75rem, 3vw, 1.5rem);
+  --jaga-composer-pad-y: clamp(1rem, 3vh, 2rem);
+  --jaga-safe-top: env(safe-area-inset-top, 0px);
+  --jaga-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --jaga-safe-left: env(safe-area-inset-left, 0px);
+  --jaga-safe-right: env(safe-area-inset-right, 0px);
+}
+
+html[data-jaga-voice-kiosk="true"],
+html[data-jaga-voice-kiosk="true"] body {
+  height: 100%;
+  overflow: hidden;
 }
 
 html[data-jaga-voice-kiosk="true"] body {
   background: #0a1628;
   color: #ffffff;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* Hide navigation chrome — voice-only experience */
@@ -31,48 +49,66 @@ html[data-jaga-voice-kiosk="true"] .shell {
   --shell-topbar-height: 0px !important;
   grid-template-columns: 1fr !important;
   grid-template-rows: 1fr !important;
+  min-height: 100dvh !important;
+  height: 100dvh !important;
 }
 
 html[data-jaga-voice-kiosk="true"] .content,
 html[data-jaga-voice-kiosk="true"] .content--chat {
+  box-sizing: border-box !important;
   margin: 0 !important;
-  padding: 0 !important;
+  padding:
+    var(--jaga-safe-top)
+    var(--jaga-safe-right)
+    var(--jaga-safe-bottom)
+    var(--jaga-safe-left) !important;
   max-width: 100% !important;
   width: 100% !important;
-  height: 100vh !important;
   height: 100dvh !important;
+  min-height: 100dvh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 /* Page header */
 html[data-jaga-voice-kiosk="true"] .content::before {
   content: "Voice Assistant";
   display: block;
+  flex-shrink: 0;
   text-align: center;
-  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-size: var(--jaga-title-size);
   font-weight: 800;
   letter-spacing: 0.02em;
   color: #ffffff;
   background: linear-gradient(180deg, #0d2240 0%, #0a1628 100%);
-  padding: 1.25rem 1rem 0.75rem;
+  padding: clamp(0.75rem, 2.5vh, 1.25rem) var(--jaga-page-pad-x)
+    clamp(0.5rem, 1.5vh, 0.75rem);
   border-bottom: 3px solid #0066cc;
 }
 
 html[data-jaga-voice-kiosk="true"] .content::after {
   content: "Tap the blue microphone to speak";
   display: block;
+  flex-shrink: 0;
   text-align: center;
-  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-size: var(--jaga-subtitle-size);
   font-weight: 600;
   color: #b8d4f0;
-  padding: 0.5rem 1rem 0;
+  padding: clamp(0.375rem, 1vh, 0.625rem) var(--jaga-page-pad-x) 0;
 }
 
 /* Chat layout: transcript above, mic below */
+html[data-jaga-voice-kiosk="true"] openclaw-router-outlet,
 html[data-jaga-voice-kiosk="true"] openclaw-chat-page,
 html[data-jaga-voice-kiosk="true"] openclaw-chat-pane,
 html[data-jaga-voice-kiosk="true"] .agent-chat {
-  height: 100% !important;
+  flex: 1 1 auto !important;
   min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  max-width: 960px !important;
+  margin-inline: auto !important;
 }
 
 html[data-jaga-voice-kiosk="true"] .agent-chat__main,
@@ -88,15 +124,21 @@ html[data-jaga-voice-kiosk="true"] .chat-thread-inner {
   flex: 1 1 auto !important;
   min-height: 0 !important;
   overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   font-size: var(--jaga-text-size) !important;
   line-height: 1.65 !important;
-  padding: 1rem 1.25rem !important;
+  padding: clamp(0.75rem, 2vh, 1.25rem) var(--jaga-page-pad-x) !important;
+  scroll-padding-bottom: 1rem;
 }
 
 html[data-jaga-voice-kiosk="true"] .msg-bubble,
 html[data-jaga-voice-kiosk="true"] .msg-content {
   font-size: var(--jaga-text-size) !important;
   line-height: 1.65 !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 html[data-jaga-voice-kiosk="true"] .agent-chat__composer {
@@ -105,10 +147,15 @@ html[data-jaga-voice-kiosk="true"] .agent-chat__composer {
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 1.5rem 1rem 2rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding:
+    clamp(0.75rem, 2vh, 1.25rem)
+    var(--jaga-page-pad-x)
+    calc(var(--jaga-composer-pad-y) + var(--jaga-safe-bottom)) !important;
   background: #0d2240 !important;
   border-top: 3px solid #0066cc !important;
-  gap: 1rem !important;
+  gap: clamp(0.625rem, 2vh, 1rem) !important;
 }
 
 /* Large high-contrast microphone button */
@@ -116,22 +163,24 @@ html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice,
 html[data-jaga-voice-kiosk="true"] .chat-send-btn--stop {
   width: var(--jaga-mic-size) !important;
   height: var(--jaga-mic-size) !important;
-  min-width: 180px !important;
-  min-height: 180px !important;
-  max-width: 320px !important;
-  max-height: 320px !important;
+  min-width: 140px !important;
+  min-height: 140px !important;
+  max-width: min(300px, 72vw) !important;
+  max-height: min(300px, 72vw) !important;
   border-radius: 50% !important;
   background: var(--jaga-mic-blue) !important;
   color: #ffffff !important;
-  border: 8px solid #ffffff !important;
+  border: var(--jaga-mic-border) solid #ffffff !important;
   box-shadow:
-    0 0 0 4px #0066cc,
-    0 12px 40px rgba(0, 102, 204, 0.55) !important;
+    0 0 0 clamp(2px, 0.6vw, 4px) #0066cc,
+    0 clamp(8px, 2vh, 12px) clamp(24px, 5vh, 40px) rgba(0, 102, 204, 0.55) !important;
   margin: 0 auto !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: transform 0.15s ease, background 0.15s ease !important;
 }
 
@@ -139,16 +188,16 @@ html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice:hover,
 html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice:focus-visible {
   background: #0077ee !important;
   transform: scale(1.04) !important;
-  outline: 4px solid #ffcc00 !important;
-  outline-offset: 6px !important;
+  outline: clamp(3px, 0.8vw, 4px) solid #ffcc00 !important;
+  outline-offset: clamp(4px, 1vw, 6px) !important;
 }
 
 html[data-jaga-voice-kiosk="true"] .chat-send-btn--stop {
   background: #cc2200 !important;
   border-color: #ffffff !important;
   box-shadow:
-    0 0 0 4px #cc2200,
-    0 12px 40px rgba(204, 34, 0, 0.45) !important;
+    0 0 0 clamp(2px, 0.6vw, 4px) #cc2200,
+    0 clamp(8px, 2vh, 12px) clamp(24px, 5vh, 40px) rgba(204, 34, 0, 0.45) !important;
 }
 
 html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice svg,
@@ -169,16 +218,17 @@ html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice:disabled {
 /* Status text — large and readable */
 html[data-jaga-voice-kiosk="true"] .agent-chat__talk-status,
 html[data-jaga-voice-kiosk="true"] .agent-chat__stt-interim {
-  font-size: clamp(1.25rem, 3vw, 1.75rem) !important;
+  box-sizing: border-box !important;
+  font-size: var(--jaga-status-size) !important;
   font-weight: 700 !important;
   text-align: center !important;
   color: #ffffff !important;
   background: #1a3a5c !important;
   border: 2px solid #0066cc !important;
-  border-radius: 12px !important;
-  padding: 1rem 1.25rem !important;
-  margin: 0 1rem !important;
-  width: calc(100% - 2rem) !important;
+  border-radius: clamp(8px, 2vw, 12px) !important;
+  padding: clamp(0.625rem, 2vh, 1rem) clamp(0.75rem, 3vw, 1.25rem) !important;
+  margin: 0 var(--jaga-page-pad-x) !important;
+  width: calc(100% - (2 * var(--jaga-page-pad-x))) !important;
   max-width: 720px !important;
 }
 
@@ -190,5 +240,141 @@ html[data-jaga-voice-kiosk="true"] .agent-chat__talk-status-text {
 /* Connection banner — larger text */
 html[data-jaga-voice-kiosk="true"] openclaw-connection-banner,
 html[data-jaga-voice-kiosk="true"] openclaw-login-gate {
-  font-size: 1.125rem !important;
+  font-size: clamp(1rem, 2.5vw, 1.125rem) !important;
+  padding-inline: var(--jaga-page-pad-x) !important;
+}
+
+/* ── Small phones (portrait) ── */
+@media (max-width: 480px) {
+  html[data-jaga-voice-kiosk="true"] {
+    --jaga-mic-size: clamp(140px, 52vw, 220px);
+    --jaga-text-size: clamp(0.9375rem, 4.2vw, 1.125rem);
+  }
+
+  html[data-jaga-voice-kiosk="true"] .content::before {
+    padding-top: calc(clamp(0.625rem, 2vh, 0.875rem) + var(--jaga-safe-top));
+  }
+}
+
+/* ── Very small screens ── */
+@media (max-width: 360px) {
+  html[data-jaga-voice-kiosk="true"] {
+    --jaga-mic-size: clamp(128px, 48vw, 180px);
+  }
+
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice,
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--stop {
+    min-width: 120px !important;
+    min-height: 120px !important;
+  }
+}
+
+/* ── Landscape phones / short viewports ── */
+@media (max-height: 520px) and (orientation: landscape) {
+  html[data-jaga-voice-kiosk="true"] {
+    --jaga-mic-size: clamp(96px, 24vh, 140px);
+    --jaga-title-size: clamp(1.125rem, 4vh, 1.5rem);
+    --jaga-subtitle-size: clamp(0.8125rem, 2.5vh, 1rem);
+  }
+
+  html[data-jaga-voice-kiosk="true"] .content::before {
+    padding-block: 0.5rem;
+    border-bottom-width: 2px;
+  }
+
+  html[data-jaga-voice-kiosk="true"] .content::after {
+    display: none;
+  }
+
+  html[data-jaga-voice-kiosk="true"] .agent-chat__main,
+  html[data-jaga-voice-kiosk="true"] .agent-chat__body {
+    flex-direction: row !important;
+    align-items: stretch !important;
+  }
+
+  html[data-jaga-voice-kiosk="true"] .chat-thread,
+  html[data-jaga-voice-kiosk="true"] .chat-thread-inner {
+    flex: 1 1 55% !important;
+    border-right: 2px solid #1a3a5c;
+  }
+
+  html[data-jaga-voice-kiosk="true"] .agent-chat__composer {
+    flex: 0 0 clamp(180px, 38vw, 260px) !important;
+    border-top: none !important;
+    border-left: 3px solid #0066cc !important;
+    justify-content: center !important;
+    padding-block: 0.75rem !important;
+  }
+
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice,
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--stop {
+    min-width: 96px !important;
+    min-height: 96px !important;
+    max-width: min(140px, 28vh) !important;
+    max-height: min(140px, 28vh) !important;
+  }
+
+  html[data-jaga-voice-kiosk="true"] .agent-chat__talk-status,
+  html[data-jaga-voice-kiosk="true"] .agent-chat__stt-interim {
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+/* ── Tablets ── */
+@media (min-width: 768px) and (max-width: 1024px) {
+  html[data-jaga-voice-kiosk="true"] {
+    --jaga-mic-size: clamp(200px, 32vmin, 260px);
+    --jaga-text-size: clamp(1.0625rem, 2vw, 1.25rem);
+  }
+
+  html[data-jaga-voice-kiosk="true"] openclaw-chat-page,
+  html[data-jaga-voice-kiosk="true"] openclaw-chat-pane,
+  html[data-jaga-voice-kiosk="true"] .agent-chat {
+    max-width: 840px !important;
+  }
+}
+
+/* ── Large desktop ── */
+@media (min-width: 1200px) {
+  html[data-jaga-voice-kiosk="true"] {
+    --jaga-mic-size: 280px;
+    --jaga-text-size: 1.375rem;
+  }
+
+  html[data-jaga-voice-kiosk="true"] openclaw-chat-page,
+  html[data-jaga-voice-kiosk="true"] openclaw-chat-pane,
+  html[data-jaga-voice-kiosk="true"] .agent-chat {
+    max-width: 960px !important;
+  }
+
+  html[data-jaga-voice-kiosk="true"] .chat-thread,
+  html[data-jaga-voice-kiosk="true"] .chat-thread-inner {
+    padding-inline: 2rem !important;
+  }
+}
+
+/* ── Coarse pointer (touch devices) ── */
+@media (hover: none) and (pointer: coarse) {
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice:active,
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--stop:active {
+    transform: scale(0.97) !important;
+    background: var(--jaga-mic-blue-active) !important;
+  }
+
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice:hover {
+    transform: none !important;
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice,
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--stop {
+    transition: none !important;
+  }
+
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice:hover,
+  html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice:focus-visible {
+    transform: none !important;
+  }
 }
