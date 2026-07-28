@@ -9,14 +9,97 @@
     <title>OpenClaw Control</title>
     <script>
       (function () {
-        var isVoice = /\/jagavoiceagent\/?$/i.test(window.location.pathname);
+        var VOICE_PATH = /\/jagavoiceagent\/?$/i;
+        var isVoice = VOICE_PATH.test(window.location.pathname);
+
+        function syncVoiceKiosk() {
+          var active = VOICE_PATH.test(window.location.pathname);
+          if (active) {
+            document.documentElement.setAttribute("data-jaga-voice-kiosk", "true");
+            document.title = "Voice Assistant";
+            try {
+              sessionStorage.setItem("jaga-voice-lock", "1");
+            } catch (e) {}
+          } else {
+            document.documentElement.removeAttribute("data-jaga-voice-kiosk");
+          }
+          var header = document.getElementById("jaga-voice-header");
+          if (header) header.hidden = !active;
+        }
+
+        function lockVoiceRoute() {
+          try {
+            if (sessionStorage.getItem("jaga-voice-lock") !== "1") return;
+          } catch (e) {
+            return;
+          }
+          if (!VOICE_PATH.test(window.location.pathname)) {
+            window.location.replace(
+              "/jagavoiceagent" + window.location.search + window.location.hash,
+            );
+          }
+        }
+
+        function hookHistory() {
+          var push = history.pushState;
+          var replace = history.replaceState;
+          history.pushState = function () {
+            push.apply(history, arguments);
+            syncVoiceKiosk();
+            lockVoiceRoute();
+          };
+          history.replaceState = function () {
+            replace.apply(history, arguments);
+            syncVoiceKiosk();
+            lockVoiceRoute();
+          };
+          window.addEventListener("popstate", function () {
+            syncVoiceKiosk();
+            lockVoiceRoute();
+          });
+        }
+
+        function parseVoiceToken() {
+          var raw = (window.location.hash || "").replace(/^#/, "");
+          if (!raw) return "";
+          try {
+            return new URLSearchParams(raw).get("token") || "";
+          } catch (e) {
+            return "";
+          }
+        }
+
+        function autoConnectVoiceKiosk() {
+          var token = parseVoiceToken().trim();
+          if (!token || token === "APNA_TOKEN" || token === "YOUR_TOKEN") return;
+
+          function clickConnect() {
+            var buttons = document.querySelectorAll("button");
+            for (var i = 0; i < buttons.length; i++) {
+              var label = (buttons[i].textContent || "").trim().toLowerCase();
+              if (label === "connect" || label.indexOf("connect to") === 0) {
+                buttons[i].click();
+                return true;
+              }
+            }
+            return false;
+          }
+
+          var tries = 0;
+          var timer = window.setInterval(function () {
+            tries += 1;
+            if (clickConnect() || tries > 40) window.clearInterval(timer);
+          }, 500);
+        }
+
+        syncVoiceKiosk();
+        hookHistory();
+        lockVoiceRoute();
+        if (isVoice) autoConnectVoiceKiosk();
         if (!isVoice) return;
 
-        document.documentElement.setAttribute("data-jaga-voice-kiosk", "true");
-        document.title = "Voice Assistant";
-
         // One-time stale service-worker reset (fixes cached broken Control UI bundles).
-        var resetFlag = "openclaw-jagavoice-cache-v20260728";
+        var resetFlag = "openclaw-jagavoice-cache-v20260728b";
         try {
           if (sessionStorage.getItem(resetFlag) === "done") return;
         } catch (e) {}
@@ -65,12 +148,43 @@
         });
       })();
     </script>
-    <link rel="stylesheet" href="./assets/jagavoice-kiosk.css?v=20260728" />
+    <link rel="stylesheet" href="./assets/jagavoice-kiosk.css?v=20260728b" />
     <style id="jagavoice-kiosk-critical">
-      /* Inline fallback when jagavoice-kiosk.css is not deployed yet */
+      html[data-jaga-voice-kiosk="true"],
       html[data-jaga-voice-kiosk="true"] body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
         background: #0a1628;
         color: #fff;
+      }
+      #jaga-voice-header {
+        box-sizing: border-box;
+        text-align: center;
+        background: linear-gradient(180deg, #0d2240 0%, #0a1628 100%);
+        border-bottom: 3px solid #0066cc;
+        padding: clamp(0.75rem, 2.5vh, 1.25rem) 1rem clamp(0.5rem, 1.5vh, 0.75rem);
+      }
+      #jaga-voice-header h1 {
+        margin: 0;
+        font-size: clamp(1.375rem, 4.5vw, 2rem);
+        font-weight: 800;
+      }
+      #jaga-voice-header p {
+        margin: 0.5rem 0 0;
+        color: #b8d4f0;
+        font-size: clamp(1rem, 2.5vw, 1.125rem);
+        font-weight: 600;
+      }
+      html[data-jaga-voice-kiosk="true"] openclaw-app {
+        display: block !important;
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+      html[data-jaga-voice-kiosk="true"] body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100dvh;
       }
       html[data-jaga-voice-kiosk="true"] .shell-nav,
       html[data-jaga-voice-kiosk="true"] .shell-nav-backdrop,
@@ -85,26 +199,47 @@
       html[data-jaga-voice-kiosk="true"] .shell {
         --shell-nav-width: 0px !important;
         --shell-topbar-height: 0px !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
         grid-template-columns: 1fr !important;
         grid-template-rows: 1fr !important;
-        min-height: 100dvh !important;
       }
-      html[data-jaga-voice-kiosk="true"] .content::before {
-        content: "Voice Assistant";
-        display: block;
-        text-align: center;
-        font-size: clamp(1.375rem, 4.5vw, 2rem);
-        font-weight: 800;
-        padding: 1rem;
-        border-bottom: 3px solid #0066cc;
+      html[data-jaga-voice-kiosk="true"] .content,
+      html[data-jaga-voice-kiosk="true"] .content--chat {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
-      html[data-jaga-voice-kiosk="true"] .content::after {
-        content: "Tap the blue microphone to speak";
-        display: block;
-        text-align: center;
-        font-size: clamp(1rem, 2.5vw, 1.125rem);
-        color: #b8d4f0;
-        padding: 0.5rem 1rem 0;
+      html[data-jaga-voice-kiosk="true"] .agent-chat,
+      html[data-jaga-voice-kiosk="true"] .agent-chat__main,
+      html[data-jaga-voice-kiosk="true"] .agent-chat__body {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      html[data-jaga-voice-kiosk="true"] .chat-thread,
+      html[data-jaga-voice-kiosk="true"] .chat-thread-inner {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+      }
+      html[data-jaga-voice-kiosk="true"] .agent-chat__composer {
+        flex-shrink: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 1rem !important;
+        background: #0d2240 !important;
+        border-top: 3px solid #0066cc !important;
       }
       html[data-jaga-voice-kiosk="true"] .chat-send-btn--voice,
       html[data-jaga-voice-kiosk="true"] .chat-send-btn--stop {
@@ -321,7 +456,7 @@
         color: #0369a1;
       }
     </style>
-    <script type="module" crossorigin src="./assets/index-Bvtt7vVx.js?v=jagavoice-20260728"></script>
+    <script type="module" crossorigin src="./assets/index-Bvtt7vVx.js?v=jagavoice-20260728b"></script>
     <link rel="modulepreload" crossorigin href="./assets/decorate-CUyPCN2p.js">
     <link rel="modulepreload" crossorigin href="./assets/lit-runtime-B2f-BITn.js">
     <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-QTnfLwEv.js">
@@ -345,6 +480,10 @@
     <link rel="stylesheet" crossorigin href="./assets/index-LH4ofOKi.css">
   </head>
   <body>
+    <header id="jaga-voice-header" hidden>
+      <h1>Voice Assistant</h1>
+      <p>Tap the blue microphone to speak</p>
+    </header>
     <openclaw-app></openclaw-app>
     <section
       id="openclaw-mount-fallback"

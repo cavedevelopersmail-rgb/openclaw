@@ -26,8 +26,41 @@ html[data-jaga-voice-kiosk="true"] body {
 html[data-jaga-voice-kiosk="true"] body {
   background: #0a1628;
   color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+}
+
+#jaga-voice-header {
+  box-sizing: border-box;
+  text-align: center;
+  background: linear-gradient(180deg, #0d2240 0%, #0a1628 100%);
+  border-bottom: 3px solid #0066cc;
+  padding: clamp(0.75rem, 2.5vh, 1.25rem) var(--jaga-page-pad-x)
+    clamp(0.5rem, 1.5vh, 0.75rem);
+}
+
+#jaga-voice-header h1 {
+  margin: 0;
+  font-size: var(--jaga-title-size);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+#jaga-voice-header p {
+  margin: clamp(0.375rem, 1vh, 0.625rem) 0 0;
+  font-size: var(--jaga-subtitle-size);
+  font-weight: 600;
+  color: #b8d4f0;
+}
+
+html[data-jaga-voice-kiosk="true"] openclaw-app {
+  display: block !important;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* Hide navigation chrome — voice-only experience */
@@ -47,55 +80,26 @@ html[data-jaga-voice-kiosk="true"] .agent-chat__control-label {
 html[data-jaga-voice-kiosk="true"] .shell {
   --shell-nav-width: 0px !important;
   --shell-topbar-height: 0px !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
   grid-template-columns: 1fr !important;
   grid-template-rows: 1fr !important;
-  min-height: 100dvh !important;
-  height: 100dvh !important;
 }
 
 html[data-jaga-voice-kiosk="true"] .content,
 html[data-jaga-voice-kiosk="true"] .content--chat {
   box-sizing: border-box !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
   margin: 0 !important;
-  padding:
-    var(--jaga-safe-top)
-    var(--jaga-safe-right)
-    var(--jaga-safe-bottom)
-    var(--jaga-safe-left) !important;
+  padding: 0 !important;
   max-width: 100% !important;
   width: 100% !important;
-  height: 100dvh !important;
-  min-height: 100dvh !important;
   overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
-}
-
-/* Page header */
-html[data-jaga-voice-kiosk="true"] .content::before {
-  content: "Voice Assistant";
-  display: block;
-  flex-shrink: 0;
-  text-align: center;
-  font-size: var(--jaga-title-size);
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: #ffffff;
-  background: linear-gradient(180deg, #0d2240 0%, #0a1628 100%);
-  padding: clamp(0.75rem, 2.5vh, 1.25rem) var(--jaga-page-pad-x)
-    clamp(0.5rem, 1.5vh, 0.75rem);
-  border-bottom: 3px solid #0066cc;
-}
-
-html[data-jaga-voice-kiosk="true"] .content::after {
-  content: "Tap the blue microphone to speak";
-  display: block;
-  flex-shrink: 0;
-  text-align: center;
-  font-size: var(--jaga-subtitle-size);
-  font-weight: 600;
-  color: #b8d4f0;
-  padding: clamp(0.375rem, 1vh, 0.625rem) var(--jaga-page-pad-x) 0;
 }
 
 /* Chat layout: transcript above, mic below */
@@ -251,7 +255,7 @@ html[data-jaga-voice-kiosk="true"] openclaw-login-gate {
     --jaga-text-size: clamp(0.9375rem, 4.2vw, 1.125rem);
   }
 
-  html[data-jaga-voice-kiosk="true"] .content::before {
+  #jaga-voice-header {
     padding-top: calc(clamp(0.625rem, 2vh, 0.875rem) + var(--jaga-safe-top));
   }
 }
@@ -277,12 +281,12 @@ html[data-jaga-voice-kiosk="true"] openclaw-login-gate {
     --jaga-subtitle-size: clamp(0.8125rem, 2.5vh, 1rem);
   }
 
-  html[data-jaga-voice-kiosk="true"] .content::before {
+  #jaga-voice-header {
     padding-block: 0.5rem;
     border-bottom-width: 2px;
   }
 
-  html[data-jaga-voice-kiosk="true"] .content::after {
+  #jaga-voice-header p {
     display: none;
   }
 
