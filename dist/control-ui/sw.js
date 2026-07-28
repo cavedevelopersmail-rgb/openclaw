@@ -2,7 +2,7 @@
 // Handles offline caching and push notifications.
 
 const CACHE_PREFIX = "openclaw-control-";
-const EMBEDDED_CACHE_VERSION = "2026.7.1-2-0790d9f593ad";
+const EMBEDDED_CACHE_VERSION = "2026.7.1-2-jagavoice-375cf74";
 const URL_CACHE_VERSION = new URL(self.location.href).searchParams
   .get("v")
   ?.replace(/[^a-zA-Z0-9._-]/g, "-");
